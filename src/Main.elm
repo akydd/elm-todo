@@ -1,7 +1,7 @@
 module Main exposing (Model, Msg(..), Todo, init, main, update)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, input, li, text, ul)
+import Html exposing (Attribute, Html, button, div, input, li, s, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -57,9 +57,19 @@ update msg model =
         AddTodo ->
             { model | newId = model.newId + 1, todos = newTodo model.newId model.newDescription :: model.todos, newDescription = "" }
 
-        -- TODO
         ToggleTodoComplete id ->
-            init
+            let
+                toggleTodo todo =
+                    if todo.id == id then
+                        { todo | complete = not todo.complete }
+
+                    else
+                        todo
+
+                updatedTodos =
+                    List.map toggleTodo model.todos
+            in
+            { model | todos = updatedTodos }
 
         Change a ->
             { model | newDescription = a }
@@ -71,7 +81,15 @@ update msg model =
 
 viewTodo : Todo -> Html Msg
 viewTodo todo =
-    li [ onClick (ToggleTodoComplete todo.id) ] [ text todo.description ]
+    let
+        formatTodo t =
+            if t.complete then
+                s [] [ text t.description ]
+
+            else
+                text t.description
+    in
+    li [ onClick (ToggleTodoComplete todo.id) ] [ formatTodo todo ]
 
 
 viewTodos : List Todo -> Html Msg
