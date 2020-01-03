@@ -25,6 +25,7 @@ type alias Model =
     { todos : List Todo
     , newId : Int
     , newDescription : String
+    , filter : String
     }
 
 
@@ -33,6 +34,7 @@ init =
     { todos = []
     , newId = 0
     , newDescription = ""
+    , filter = "All"
     }
 
 
@@ -49,6 +51,7 @@ type Msg
     = AddTodo
     | ToggleTodoComplete Int
     | Change String
+    | Filter String
 
 
 update : Msg -> Model -> Model
@@ -74,6 +77,9 @@ update msg model =
         Change a ->
             { model | newDescription = a }
 
+        Filter filterType ->
+            { model | filter = filterType }
+
 
 
 -- VIEW
@@ -92,9 +98,14 @@ viewTodo todo =
     li [ onClick (ToggleTodoComplete todo.id) ] [ formatTodo todo ]
 
 
-viewTodos : List Todo -> Html Msg
-viewTodos todos =
+viewTodos : List Todo -> String -> Html Msg
+viewTodos todos filterType =
     ul [] (List.map viewTodo todos)
+
+
+viewFilter : String -> String -> Html Msg
+viewFilter filter activeFilter =
+    button [ onClick (Filter filter), disabled (filter == activeFilter) ] [ text filter ]
 
 
 view : Model -> Html Msg
@@ -102,5 +113,6 @@ view model =
     div []
         [ input [ placeholder "Enter description", value model.newDescription, onInput Change ] []
         , button [ onClick AddTodo ] [ text "Add Todo" ]
-        , div [] [ viewTodos model.todos ]
+        , div [] [ viewTodos model.todos model.filter ]
+        , div [] [ text "Show:", viewFilter "All" model.filter, viewFilter "Active" model.filter, viewFilter "Completed" model.filter ]
         ]
