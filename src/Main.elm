@@ -100,7 +100,18 @@ viewTodo todo =
 
 viewTodos : List Todo -> String -> Html Msg
 viewTodos todos filterType =
-    ul [] (List.map viewTodo todos)
+    case filterType of
+        "All" ->
+            ul [] (List.map viewTodo todos)
+
+        "Active" ->
+            ul [] (List.map viewTodo (List.filter (\t -> not t.complete) todos))
+
+        "Completed" ->
+            ul [] (List.map viewTodo (List.filter (\t -> t.complete) todos))
+
+        _ ->
+            ul [] []
 
 
 viewFilter : String -> String -> Html Msg
